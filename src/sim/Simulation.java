@@ -8,24 +8,26 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class Game extends Canvas implements Runnable {
+public class Simulation extends Canvas implements Runnable {
 	private static final long serialVersionUID = -6748925586576993018L;
-	public boolean running;
+	public boolean running, pressed = false, select = 0;
 	public static final int WIDTH = 1024, HEIGHT = 768;
 	public double gravity = 0.5;
-	public int mouseX, mouseY;
+	public int mouseX, mouseY, startX, startY, endX, endY;
 	MouseInput mouseInput;
 	LinkedList<Body> objects = new LinkedList<Body>();
 	private Thread thread;
 	
 	public void mousePressed(int mouseX, int mouseY) {
-		this.mouseX = mouseX;
-		this.mouseY = mouseY;
+		this.startX = mouseX;
+		this.startY = mouseY;
+		pressed = true;
 	}
 	
 	public void mouseReleased(int mouseX, int mouseY) {
-		this.mouseX = mouseX;
-		this.mouseY = mouseY;
+		this.endX = mouseX;
+		this.endY = mouseY;
+		pressed = false;
 	}
 	
 	public void mouseDragged(int mouseX, int mouseY) {
@@ -55,6 +57,13 @@ public class Game extends Canvas implements Runnable {
 		for(int i=0;i<objects.size();i++) {
 			Body tempObject = objects.get(i);
 			tempObject.render(g);
+		}
+		
+		if(pressed) {
+			g.setColor(Color.red);
+			switch(select) {
+				case 1: g.
+			}
 		}
 		
 		g.dispose();
@@ -95,8 +104,8 @@ public class Game extends Canvas implements Runnable {
 		objects.remove(obj);
 	}
 	
-	public Game() {
-		new Window(WIDTH, HEIGHT, "Game", this);
+	public Simulation() {
+		new Window(WIDTH, HEIGHT, "Sim", this);
 		mouseInput = new MouseInput(this);
 		this.addMouseListener(mouseInput);
 		this.addMouseMotionListener(mouseInput);
@@ -124,6 +133,6 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public static void main(String args[]) {
-		new Game();
+		new Simulation();
 	}
 }
