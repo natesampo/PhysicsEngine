@@ -20,6 +20,7 @@ public class Simulation extends Canvas implements Runnable {
 	ArrayList<Point2D> v2 = new ArrayList<Point2D>();
 	MouseInput mouseInput;
 	KeyInput keyInput;
+	Body tempObject;
 	LinkedList<Body> objects = new LinkedList<Body>();
 	private Thread thread;
 	
@@ -30,7 +31,18 @@ public class Simulation extends Canvas implements Runnable {
 		this.mouseY = mouseY;
 		pressed = true;
 		switch(select) {
-		case 0:
+			case 0: int highestLayer = -1;
+					int highestLayerIndex = -1;
+					for(int i=0;i<objects.size();i++) {
+						objects.get(i).chosen = false;
+						if(objects.get(i).checkSelect(mouseX, mouseY, highestLayer)) {
+							highestLayer = objects.get(i).layer;
+							highestLayerIndex = i;
+						}
+					}
+					if(highestLayerIndex != -1) {
+						objects.get(highestLayerIndex).chosen = true;
+					}
 		}
 	}
 	
@@ -38,13 +50,13 @@ public class Simulation extends Canvas implements Runnable {
 		this.endX = mouseX;
 		this.endY = mouseY;
 		switch(select) {
-			case 1: if(this.endX != this.startX && this.endY != this.startY) {
+			case 1: if(this.endX != this.startX && this.endY != this.startY && pressed) {
 						ArrayList<Point2D> v1 = new ArrayList<Point2D>();
 						v1.add(new Point2D.Double(this.startX, this.startY));
 						v1.add(new Point2D.Double(this.startX, this.endY));
 						v1.add(new Point2D.Double(this.endX, this.endY));
 						v1.add(new Point2D.Double(this.endX, this.startY));
-						this.addObject(new Body(v1));
+						this.addObject(new Body(v1, 1, this));
 					} break;
 			case 2: v2.add(new Point2D.Double(this.endX, this.endY)); break;
 		}
@@ -59,7 +71,7 @@ public class Simulation extends Canvas implements Runnable {
 		if(key==10) {
 			switch(select) {
 				case 2: if(v2.size() > 2) {
-							addObject(new Body(v2));
+							addObject(new Body(v2, 1, this));
 						} else {
 							System.out.println("Must have at least 3 points to make a shape");
 						}
@@ -71,6 +83,12 @@ public class Simulation extends Canvas implements Runnable {
 							v2.remove(v2.size()-1);
 						}
 			}
+		} else if(key>=48 && key<=57) {
+			if(select != key-48) {
+				select = key-48;
+				v2 = new ArrayList<Point2D>();
+				pressed = false;
+			}
 		}
 	}
 	
@@ -81,7 +99,7 @@ public class Simulation extends Canvas implements Runnable {
 
 	public void tick() {
 		for(int i=0;i<objects.size();i++) {
-			Body tempObject = objects.get(i);
+			tempObject = objects.get(i);
 			tempObject.tick();
 		}
 	}
@@ -147,7 +165,17 @@ public class Simulation extends Canvas implements Runnable {
     }
 	
 	public void addObject(Body obj) {
-		objects.add(obj);
+		boolean added = false;
+		for(int i=0;i<objects.size();i++) {
+			if(objects.get(i).layer > obj.layer) {
+				objects.add(i, obj);
+				added = true;
+				break;
+			}
+		}
+		if(!added) {
+			objects.add(obj);
+		}
 	}
 	
 	public void removeObject(Body obj) {
@@ -166,7 +194,7 @@ public class Simulation extends Canvas implements Runnable {
 		v.add(new Point2D.Double(0, 800));
 		v.add(new Point2D.Double(1100, 800));
 		v.add(new Point2D.Double(1100, 650));
-		addObject(new Body(v));
+		addObject(new Body(v, 1, this));
 	}
 	
 	public synchronized void start() {
