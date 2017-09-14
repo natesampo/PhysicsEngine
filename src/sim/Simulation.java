@@ -3,6 +3,7 @@ package sim;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Polygon;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
@@ -10,24 +11,62 @@ import java.util.LinkedList;
 
 public class Simulation extends Canvas implements Runnable {
 	private static final long serialVersionUID = -6748925586576993018L;
-	public boolean running, pressed = false, select = 0;
+	public boolean running, pressed = false;
 	public static final int WIDTH = 1024, HEIGHT = 768;
+	public int select = 2;
 	public double gravity = 0.5;
 	public int mouseX, mouseY, startX, startY, endX, endY;
+	public Polygon shape;
+	ArrayList<Point2D> v2 = new ArrayList<Point2D>();
 	MouseInput mouseInput;
+	KeyInput keyInput;
 	LinkedList<Body> objects = new LinkedList<Body>();
 	private Thread thread;
 	
 	public void mousePressed(int mouseX, int mouseY) {
 		this.startX = mouseX;
 		this.startY = mouseY;
+		this.mouseX = mouseX;
+		this.mouseY = mouseY;
 		pressed = true;
 	}
 	
 	public void mouseReleased(int mouseX, int mouseY) {
 		this.endX = mouseX;
 		this.endY = mouseY;
-		pressed = false;
+		switch(select) {
+			case 1: if(this.endX != this.startX && this.endY != this.startY) {
+						ArrayList<Point2D> v1 = new ArrayList<Point2D>();
+						v1.add(new Point2D.Double(this.startX, this.startY));
+						v1.add(new Point2D.Double(this.startX, this.endY));
+						v1.add(new Point2D.Double(this.endX, this.endY));
+						v1.add(new Point2D.Double(this.endX, this.startY));
+						this.addObject(new Body(v1));
+					} break;
+			case 2: v2.add(new Point2D.Double(this.endX, this.endY)); break;
+		}
+		this.mouseX = this.startX;
+		this.mouseY = this.startY;
+		if(select!=2) {
+			pressed = false;
+		}
+	}
+	
+	public void keyPressed(int key) {
+		if(key==10) {
+			switch(select) {
+				case 2: if(v2.size() > 2) {
+							addObject(new Body(v2));
+						}
+						v2 = new ArrayList<Point2D>(); break;
+			}
+		} else if(key==8) {
+			switch(select) {
+				case 2: if(v2.size() >= 1) {
+							v2.remove(v2.size()-1);
+						}
+			}
+		}
 	}
 	
 	public void mouseDragged(int mouseX, int mouseY) {
@@ -62,7 +101,13 @@ public class Simulation extends Canvas implements Runnable {
 		if(pressed) {
 			g.setColor(Color.red);
 			switch(select) {
-				case 1: g.
+				case 1: g.fillRect(Math.min(this.startX, this.mouseX), Math.min(this.startY, this.mouseY), Math.abs(this.mouseX - this.startX), Math.abs(this.mouseY - this.startY)); break;
+				case 2: shape = new Polygon();
+						for(int i=0;i<v2.size();i++) {
+							g.fillOval((int) v2.get(i).getX() - 5, (int) v2.get(i).getY() - 5, 10, 10);
+							shape.addPoint((int) v2.get(i).getX(), (int) v2.get(i).getY());
+						}
+						g.fillPolygon(shape); break;
 			}
 		}
 		
@@ -106,8 +151,10 @@ public class Simulation extends Canvas implements Runnable {
 	
 	public Simulation() {
 		new Window(WIDTH, HEIGHT, "Sim", this);
+		keyInput = new KeyInput(this);
 		mouseInput = new MouseInput(this);
 		this.addMouseListener(mouseInput);
+		this.addKeyListener(keyInput);
 		this.addMouseMotionListener(mouseInput);
 		ArrayList<Point2D> v = new ArrayList<Point2D>();
 		v.add(new Point2D.Double(0, 650));

@@ -5,7 +5,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener, MouseMotionListener {
-	Game game;
+	Simulation simulation;
 	public void mouseClicked(MouseEvent e) {
 		
 	}
@@ -21,23 +21,23 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	public void mousePressed(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.game.mousePressed(mouseX, mouseY);
+		this.simulation.mousePressed(mouseX, mouseY);
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.game.mouseReleased(mouseX, mouseY);
+		this.simulation.mouseReleased(mouseX, mouseY);
 	}
 	
-	public MouseInput(Game game) {
-		this.game = game;
+	public MouseInput(Simulation simulation) {
+		this.simulation = simulation;
 	}
 
 	public void mouseDragged(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.game.mouseDragged(mouseX, mouseY);
+		this.simulation.mouseDragged(mouseX, mouseY);
 	}
 
 	public void mouseMoved(MouseEvent e) {
