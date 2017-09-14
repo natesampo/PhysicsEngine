@@ -13,7 +13,7 @@ public class Simulation extends Canvas implements Runnable {
 	private static final long serialVersionUID = -6748925586576993018L;
 	public boolean running, pressed = false;
 	public static final int WIDTH = 1024, HEIGHT = 768;
-	public int select = 2;
+	public int select = 0;
 	public double gravity = 0.5;
 	public int mouseX, mouseY, startX, startY, endX, endY;
 	public Polygon shape;
@@ -29,6 +29,9 @@ public class Simulation extends Canvas implements Runnable {
 		this.mouseX = mouseX;
 		this.mouseY = mouseY;
 		pressed = true;
+		switch(select) {
+		case 0:
+		}
 	}
 	
 	public void mouseReleased(int mouseX, int mouseY) {
@@ -57,6 +60,8 @@ public class Simulation extends Canvas implements Runnable {
 			switch(select) {
 				case 2: if(v2.size() > 2) {
 							addObject(new Body(v2));
+						} else {
+							System.out.println("Must have at least 3 points to make a shape");
 						}
 						v2 = new ArrayList<Point2D>(); break;
 			}
