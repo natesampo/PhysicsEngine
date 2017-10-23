@@ -15,9 +15,12 @@ public class Simulation extends Canvas implements Runnable {
 	public static final int WIDTH = 1024, HEIGHT = 768;
 	public int select = 0;
 	public double gravity = 0.5;
-	public int mouseX, mouseY, startX, startY, endX, endY;
+	public double drag = 0.5;
+	public int mouseX, mouseY, startX, startY, endX, endY, lastStartX, lastStartY;
 	public Polygon shape;
+	public int chosen = -1;
 	ArrayList<Point2D> v2 = new ArrayList<Point2D>();
+	ArrayList<Point2D> mouseDelta;
 	MouseInput mouseInput;
 	KeyInput keyInput;
 	Body tempObject;
@@ -33,15 +36,21 @@ public class Simulation extends Canvas implements Runnable {
 		switch(select) {
 			case 0: int highestLayer = -1;
 					int highestLayerIndex = -1;
+					this.chosen = -1;
 					for(int i=0;i<objects.size();i++) {
 						objects.get(i).chosen = false;
-						if(objects.get(i).checkSelect(mouseX, mouseY, highestLayer)) {
+						if(objects.get(i).checkSelect(this.mouseX, this.mouseY, highestLayer)) {
 							highestLayer = objects.get(i).layer;
 							highestLayerIndex = i;
 						}
 					}
 					if(highestLayerIndex != -1) {
 						objects.get(highestLayerIndex).chosen = true;
+						this.chosen = highestLayerIndex;
+						this.mouseDelta = new ArrayList<Point2D>();
+						for(int i=0;i<objects.get(highestLayerIndex).vertex.size();i++) {
+							this.mouseDelta.add(new Point2D.Double(objects.get(highestLayerIndex).vertex.get(i).getX()-this.mouseX, objects.get(highestLayerIndex).vertex.get(i).getY()-this.mouseY));
+						}
 					}
 		}
 	}
@@ -50,6 +59,10 @@ public class Simulation extends Canvas implements Runnable {
 		this.endX = mouseX;
 		this.endY = mouseY;
 		switch(select) {
+			case 0: if(this.chosen > -1) {
+				objects.get(this.select).velX = this.endX-this.lastStartX;
+				objects.get(this.select).velY = this.endY-this.lastStartY;
+			} break;
 			case 1: if(this.endX != this.startX && this.endY != this.startY && pressed) {
 						ArrayList<Point2D> v1 = new ArrayList<Point2D>();
 						v1.add(new Point2D.Double(this.startX, this.startY));
@@ -95,6 +108,19 @@ public class Simulation extends Canvas implements Runnable {
 	public void mouseDragged(int mouseX, int mouseY) {
 		this.mouseX = mouseX;
 		this.mouseY = mouseY;
+		for(int i=0;i<objects.size();i++) {
+			if(objects.get(i).chosen) {
+				for(int j=0;j<objects.get(i).vertex.size();j++) {
+					objects.get(i).vertex.set(j, new Point2D.Double(this.mouseX + this.mouseDelta.get(j).getX(), this.mouseY + this.mouseDelta.get(j).getY()));
+				}
+				//objects.get(i).velX = this.mouseX-this.startX;
+				//objects.get(i).velY = this.mouseY-this.startY;
+				this.lastStartX = this.startX;
+				this.lastStartY = this.startY;
+				this.startX = this.mouseX;
+				this.startY = this.mouseY;
+			}
+		}
 	}
 
 	public void tick() {
@@ -157,7 +183,7 @@ public class Simulation extends Canvas implements Runnable {
             frames++;
             if(System.currentTimeMillis() - timer > 1000) {
             	timer += 1000;
-            	System.out.println("FPS: "+ frames);
+            	//System.out.println("FPS: "+ frames);
             	frames = 0;
             }
         }
@@ -189,12 +215,12 @@ public class Simulation extends Canvas implements Runnable {
 		this.addMouseListener(mouseInput);
 		this.addKeyListener(keyInput);
 		this.addMouseMotionListener(mouseInput);
-		ArrayList<Point2D> v = new ArrayList<Point2D>();
+		/*ArrayList<Point2D> v = new ArrayList<Point2D>();
 		v.add(new Point2D.Double(0, 650));
 		v.add(new Point2D.Double(0, 800));
 		v.add(new Point2D.Double(1100, 800));
 		v.add(new Point2D.Double(1100, 650));
-		addObject(new Body(v, 1, this));
+		addObject(new Body(v, 1, this));*/
 	}
 	
 	public synchronized void start() {
