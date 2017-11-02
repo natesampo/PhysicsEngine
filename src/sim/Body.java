@@ -19,7 +19,7 @@ public class Body {
 	public void tick() {
 		this.collide = this.checkCollision();
 		if(this.collide > -1) {
-			
+			System.out.println(this.collide);
 		} else {
 			this.drag.set(0, -this.velX * this.simulation.drag);
 			this.drag.set(1, -this.velY * this.simulation.drag);
@@ -56,6 +56,9 @@ public class Body {
 	
 	public int checkCollision() {
 		for(int i=0;i<this.simulation.objects.size();i++) {
+			if(this.simulation.objects.get(i) == this) {
+				continue;
+			}
 			for(int v=0;v<this.simulation.objects.get(i).vertex.size();v++) {
 				if(this.shape.contains(this.simulation.objects.get(i).vertex.get(v).getX(), this.simulation.objects.get(i).vertex.get(v).getY())) {
 					return i;
