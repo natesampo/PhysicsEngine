@@ -7,9 +7,10 @@ public class KeyInput implements KeyListener {
 	Simulation simulation;
 	int key;
 	
+	// When a key is pressed, call the method within Simulation and pass the key index of the key that was pressed
 	public void keyPressed(KeyEvent e) {
 		key = e.getKeyCode();
-		this.simulation.keyPressed(key);
+		simulation.keyPressed(key);
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -20,7 +21,7 @@ public class KeyInput implements KeyListener {
 		
 	}
 	
-	public KeyInput(Simulation simulation) {
+	public KeyInput(Simulation simulation) { // Constructor sets simulation so that we can call that method when a key is pressed
 		this.simulation = simulation;
 	}
 

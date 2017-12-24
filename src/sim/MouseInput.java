@@ -6,6 +6,8 @@ import java.awt.event.MouseMotionListener;
 
 public class MouseInput implements MouseListener, MouseMotionListener {
 	Simulation simulation;
+	
+	// All of the methods called by the MouseListener and MouseMotionListener. The ones being used are passed to the Simulation object as well as mouse position
 	public void mouseClicked(MouseEvent e) {
 		
 	}
@@ -21,23 +23,23 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	public void mousePressed(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.simulation.mousePressed(mouseX, mouseY);
+		simulation.mousePressed(mouseX, mouseY);
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.simulation.mouseReleased(mouseX, mouseY);
+		simulation.mouseReleased(mouseX, mouseY);
 	}
 	
-	public MouseInput(Simulation simulation) {
+	public MouseInput(Simulation simulation) { // mouseInput constructor stores the simulation so that it can call those methods
 		this.simulation = simulation;
 	}
 
 	public void mouseDragged(MouseEvent e) {
 		int mouseX = e.getX();
 		int mouseY = e.getY();
-		this.simulation.mouseDragged(mouseX, mouseY);
+		simulation.mouseDragged(mouseX, mouseY);
 	}
 
 	public void mouseMoved(MouseEvent e) {
